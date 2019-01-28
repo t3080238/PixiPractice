@@ -13,16 +13,22 @@
             if (!PIXI.utils.isWebGLSupported()){type = "canvas"} 
             PIXI.utils.sayHello(type);
 
+            let rocket;
+
             //Aliases 設定別名
             let Application = PIXI.Application,
                 resources = PIXI.loader.resources,
                 loader = PIXI.loader,
-                Sprite = PIXI.Sprite;
+                Sprite = PIXI.Sprite,
+                TextureCache = PIXI.TextureCache;
+                Rectangle = PIXI.Rectangle;
+                //renderer = PIXI.renderer;
+                //render = PIXI.render;
 
             // Create a Pixi Application 
             let app = new Application({
-                width: 800,         // default: 800
-                height: 600,        // default: 600
+                width: 1024,         // default: 1024
+                height: 768,        // default: 768
                 antialias: true,    // default: false
                 transparent: false, // default: false
                 resolution: 1,       // default: 1
@@ -37,51 +43,55 @@
                 //BallImage為別名
                 //.add("BallImage", "images/PokemonBall.png")
                 .add([
-                    "images/PokemonBall1.png",
-                    "images/PokemonBall2.png"
+                    "images/tileset.png",
                 ])
                 .on("progress", loadProgressHandler)
-                .load(loadImage);
+                .load(initial);
 
             function loadProgressHandler(loader, resource){
                 let resourceName = resource.url;
                 console.log(resourceName);
                 let loadPercent = loader.progress;
                 console.log(loadPercent);
-
             }
             
-            function loadImage() {
-                //let ball1 = new Sprite(PIXI.loader.resources["images/PokemonBall.png"].texture); 未用別名
-                let ball1 = new Sprite(resources["images/PokemonBall1.png"].texture);
-                let ball2 = new Sprite(resources["images/PokemonBall2.png"].texture);
+            function initial() {
+                //Create the `tileset` sprite from the texture
+                let texture = TextureCache["images/tileset.png"];
+                
+                //Create a rectangle object that defines the position and
+                //size of the sub-image you want to extract from the texture
+                //(`Rectangle` is an alias for `PIXI.Rectangle`)
+                let rectangle = new Rectangle(192, 128, 64, 64);
 
-                ball1.width=120;
-                ball1.height=120;
+                //Tell the texture to use that rectangular section
+                texture.frame = rectangle;
 
-                ball2.width=150;
-                ball2.height=150;
-                ball2.position.set(100, 100);
+                //Create the sprite from the texture
+                rocket = new Sprite(texture);
+
+                //Position the rocket sprite on the canvas
+                rocket.x = 32;
+                rocket.y = 32;
 
                 // Add the ball1 to the stage
-                app.stage.addChild(ball1);
-                app.stage.addChild(ball2);
-                requestAnimationFrame(function(){
-                    update(ball2);
-                });
+                app.stage.addChild(rocket);
+
+                //Render the stage   
+                //renderer.render(stage);
+
+                requestAnimationFrame(update);
             }
 
-            function update(ball2){
-                app.renderer.view.style.position = "absolute";
+            function update(){
+                /*app.renderer.view.style.position = "absolute";
                 app.renderer.view.style.display = "block";
                 app.renderer.autoResize = true;
-                app.renderer.resize(window.innerWidth, window.innerHeight);
+                app.renderer.resize(window.innerWidth, window.innerHeight);*/
 
-                ball2.position.set((window.innerWidth-150)/2, (window.innerHeight-150)/2);
+                rocket.position.set((window.innerWidth-150)/2, (window.innerHeight-150)/2);
 
-                requestAnimationFrame(function(){
-                    update(ball2);
-                });
+                requestAnimationFrame(update);
             }
 
        </script>
