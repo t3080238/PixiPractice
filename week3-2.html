@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>week3-2</title>
+        <script type="text/javascript">
+            var cvs,ctx;
+            var arrParticle = [];
+            var numParticle = 0;
+            var times = 0;
+
+            function Particles(speed, degree, life){
+                this.speed=speed;
+                this.degree=degree;
+                this.life=life;
+                this.posX=400;
+                this.posY=300;
+
+                this.particleMove=function(){
+                    this.posX+=this.speed*Math.cos(degree/(2*Math.PI));
+                    this.posY+=this.speed*Math.sin(degree/(2*Math.PI));
+                }
+
+                this.particleDraw=function(){
+                    ctx.fillStyle="red";
+                    ctx.beginPath();
+                    ctx.arc(this.posX, this.posY, 10, 0, Math.PI*2, true);
+                    ctx.fill();
+                }
+            }  
+
+            requestAnimationFrame(update);
+
+            window.onload=function(){
+                cvs=document.getElementById("cvs");
+                ctx=cvs.getContext("2d");
+            }
+
+            function update(){
+                ctx.clearRect(0, 0, 800, 600);
+                times++;
+                if(times>=6){
+                    times=0;
+                    addParticle();
+                }
+                for(var i=0;i<arrParticle.length;i++){
+                    arrParticle[i].particleMove();
+                    arrParticle[i].particleDraw();
+                }
+                requestAnimationFrame(update); 
+            }
+
+            function addParticle(){
+                var ranSpeed=Math.floor(Math.random()*3+1);
+                var ranDegree=Math.floor(Math.random()*360);
+                var ranLife=Math.floor(Math.random()*100+60);
+
+                arrParticle[numParticle]=new Particles(ranSpeed, ranDegree, ranLife);
+
+                numParticle++;
+                if(numParticle>100)
+                    numParticle=0;
+            }
+
+        </script>
+    </head>
+    <body>
+        <canvas id="cvs" width="800" height="600" style="border:1px solid
+            #000000"></canvas>
+    </body>
+</html>

@@ -4,96 +4,11 @@
         <meta charset="utf-8" />
         <title>StarWar</title>
         <script src="pixi.min.js"></script>
+
         <style>* {padding: 0; margin: 0}</style>
 
     </head>
     <body>
-        <script type="text/javascript">
-            let type = "WebGL";
-            if (!PIXI.utils.isWebGLSupported()){type = "canvas"} 
-            PIXI.utils.sayHello(type);
-
-            let rocket;
-
-            //Aliases 設定別名
-            let Application = PIXI.Application,
-                resources = PIXI.loader.resources,
-                loader = PIXI.loader,
-                Sprite = PIXI.Sprite,
-                TextureCache = PIXI.TextureCache;
-                Rectangle = PIXI.Rectangle;
-                //renderer = PIXI.renderer;
-                //render = PIXI.render;
-
-            // Create a Pixi Application 
-            let app = new Application({
-                width: 1024,         // default: 1024
-                height: 768,        // default: 768
-                antialias: true,    // default: false
-                transparent: false, // default: false
-                resolution: 1,       // default: 1
-                //backgroundColor: 0x061639
-            });
-
-            // Add the canvas that Pixi automatically created for you to the HTML document 
-            document.body.appendChild(app.view);
-
-            // load an image and run the `loadImage` function when it's done
-            loader
-                //BallImage為別名
-                //.add("BallImage", "images/PokemonBall.png")
-                .add([
-                    "images/tileset.png",
-                ])
-                .on("progress", loadProgressHandler)
-                .load(initial);
-
-            function loadProgressHandler(loader, resource){
-                let resourceName = resource.url;
-                console.log(resourceName);
-                let loadPercent = loader.progress;
-                console.log(loadPercent);
-            }
-            
-            function initial() {
-                //Create the `tileset` sprite from the texture
-                let texture = TextureCache["images/tileset.png"];
-                
-                //Create a rectangle object that defines the position and
-                //size of the sub-image you want to extract from the texture
-                //(`Rectangle` is an alias for `PIXI.Rectangle`)
-                let rectangle = new Rectangle(192, 128, 64, 64);
-
-                //Tell the texture to use that rectangular section
-                texture.frame = rectangle;
-
-                //Create the sprite from the texture
-                rocket = new Sprite(texture);
-
-                //Position the rocket sprite on the canvas
-                rocket.x = 32;
-                rocket.y = 32;
-
-                // Add the ball1 to the stage
-                app.stage.addChild(rocket);
-
-                //Render the stage   
-                //renderer.render(stage);
-
-                requestAnimationFrame(update);
-            }
-
-            function update(){
-                /*app.renderer.view.style.position = "absolute";
-                app.renderer.view.style.display = "block";
-                app.renderer.autoResize = true;
-                app.renderer.resize(window.innerWidth, window.innerHeight);*/
-
-                rocket.position.set((window.innerWidth-150)/2, (window.innerHeight-150)/2);
-
-                requestAnimationFrame(update);
-            }
-
-       </script>
+        <script src="game.js"></script>
     </body>
 </html>
