@@ -2,24 +2,35 @@ let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) { type = "canvas" }
 PIXI.utils.sayHello(type);
 
-let enemyPool = [];
+let enemy = [];
 let bullet = [];
 let fire = [];
+let rocket = [];
 let enemiesContainer;
-let aliveEnemy = 0;
-let useBullet = 0;
+let aliveEnemyNum = 0, totalEnemeNum = 0;
+let useBullet = 0, useFire = 0;
+let attackTimer = 0;
+let bulletTimer = 0;
+let state;
+let containerWidth = 0;
+let loseText, pressEnterText, winText;
 
-const rowEnemy = 15;
+const rowEnemy = 3;
 const screenWidth = 1024;
 const screenHeight = 768;
 const bulletVy = 10;
 const maxBullet = 10;
-const maxFire = 10;
+const maxFire = 20;
+const attackFrame = 50;
+const atuoShootFrame = 12;
+const fireSpeed = 3;
+const play = "play", pause = "pause", dead = "dead", stop = "stop";
 
 let left = keyboard(37),
     up = keyboard(38),
     right = keyboard(39),
-    down = keyboard(40);
+    down = keyboard(40),
+    space = keyboard(32);
 
 //Aliases 設定別名
 let Application = PIXI.Application,
@@ -60,22 +71,21 @@ function loadProgressHandler(loader, resource) {
     console.log(loadPercent);
 }
 
-function enemy(posNum, texture) {
-    this.sprite = new Sprite(texture);
-    this.sprite.position.set((posNum - 1) % rowEnemy * 50 + 50, Math.floor((posNum - 1) / rowEnemy) * 50 + 50);
-    this.sprite.width = 32;
-    this.sprite.height = 32;
-    enemiesContainer.addChild(this.sprite);
-}
-
 function creatEnemy(imageName) {
     let texture = TextureCache[imageName];
     enemiesContainer = new PIXI.Container();
     for (let i = 0; i < rowEnemy * 2 + rowEnemy / 2; i++) {
-        enemyPool[i] = new enemy(i * 2 + 1, texture);
-        aliveEnemy++;
+        enemy[i] = new Sprite(texture);
+        enemy[i].position.set((i * 2) % rowEnemy * 50 + 50, Math.floor((i * 2) / rowEnemy) * 50 + 50);
+        enemy[i].width = 32;
+        enemy[i].height = 32;
+        enemiesContainer.addChild(enemy[i]);
+        aliveEnemyNum++;
     }
+    totalEnemeNum = aliveEnemyNum;
+    enemiesContainer.vx = 1;
     app.stage.addChild(enemiesContainer);
+    containerWidth = enemiesContainer.width;
 }
 
 function creatPlayer(imageName) {
@@ -84,12 +94,13 @@ function creatPlayer(imageName) {
     player.vx = 0;
     player.vy = 0;
     app.stage.addChild(player);
-    player.position.set(400, 600);
+    player.position.set((screenWidth - player.width) / 2, screenHeight - 100);
 }
 
 function creatExplore(imageName) {
     texture = TextureCache[imageName];
     explore = new Sprite(texture);
+    explore.visible = false;
     app.stage.addChild(explore);
     explore.position.set(150, 550);
 }
@@ -101,7 +112,7 @@ function creatBullet(imageName) {
         bullet[i].visible = false;
         bullet[i].vx = 0;
         bullet[i].vy = 0;
-        //bullet[i].position.set(-100, -100);
+        bullet[i].position.set(-100, -100);
         app.stage.addChild(bullet[i]);
     }
 }
@@ -110,66 +121,184 @@ function creatEnemyFire(imageName) {
     texture = TextureCache[imageName];
     for (let i = 0; i < maxFire; i++) {
         fire[i] = new Sprite(texture);
-        bullet[i].visible = false;
+        fire[i].visible = false;
         fire[i].vx = 0;
         fire[i].vy = 0;
         fire[i].x = 2000;
         fire[i].y = 1500;
         app.stage.addChild(fire[i]);
-        fire[i].position.set(150, 650);
     }
 }
 
 function creatRocket(imageName) {
     texture = TextureCache[imageName];
-    rocket = new Sprite(texture);
-    rocket.anchor.set(1.0, 0.0);
-    rocket.rotation = Math.PI / 180 * 270;
-    app.stage.addChild(rocket);
+    for (let i = 0; i < 18; i++) {
+        rocket[i] = new Sprite(texture);
+        rocket[i].anchor.set(0.5, 0.5);
+        if (i < 12 && i>=6){
+            rocket[i].rotation = Math.PI / 180 * 60 * i + 30;
+        }
+        else{
+            rocket[i].rotation = Math.PI / 180 * 60 * i;
+        }
+        rocket[i].vx = 2;
+        rocket[i].vy = 0;
+        rocket[i].position.set(screenWidth / 2, screenHeight / 2);
+        rocket[i].visible = false;
+        app.stage.addChild(rocket[i]);
+    }
+
+}
+
+function creatText() {
+    let style1 = new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 72,
+        fill: "white",
+        stroke: '#ff3300',
+        strokeThickness: 6
+    });
+
+    let style2 = new PIXI.TextStyle({
+        fontFamily: "微軟正黑體",
+        fontSize: 48,
+        fill: "white"
+    });
+
+    let style3 = new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 72,
+        fill: "#f0cf57"
+    });
+
+    loseText = new PIXI.Text("You Lose", style1);
+    loseText.position.set((screenWidth - loseText.width) / 2, (screenHeight - loseText.height) / 2);
+    loseText.visible = false;
+    app.stage.addChild(loseText);
+
+    pressEnterText = new PIXI.Text("按Enter鍵重新遊戲", style2);
+    pressEnterText.position.set((screenWidth - pressEnterText.width) / 2, (screenHeight) * 2 / 3);
+    pressEnterText.visible = false;
+    app.stage.addChild(pressEnterText);
+
+    winText = new PIXI.Text("You Win", style3);
+    winText.position.set((screenWidth - winText.width) / 2, (screenHeight - winText.height) / 2);
+    winText.visible = false;
+    app.stage.addChild(winText);
+}
+
+function replayGame() {
+    enemy.forEach(function (ene) {
+        ene.visible = true;
+    })
+    enemiesContainer.x = 0;
+    enemiesContainer.vy = 1;
+    aliveEnemyNum = totalEnemeNum;
+
+    player.visible = true;
+    player.position.set((screenWidth - player.width) / 2, screenHeight - 100);
+    player.vx = 0;
+    player.vy = 0;
+
+    fire.forEach(function (fir) {
+        fir.visible = false;
+        fir.vx = 0;
+        fir.vy = 0;
+        fir.x = 2000;
+        fir.y = 1500;
+    });
+
+    bullet.forEach(function (bul) {
+        bul.visible = false;
+        bul.vx = 0;
+        bul.vy = 0;
+        bul.position.set(-100, -100);
+    });
+
+    explore.visible = false;
+    loseText.visible = false;
+    pressEnterText.visible = false;
+    winText.visible = false;
+
+    state = play;
+    attackTimer = 0;
 }
 
 function initial() {
-
     creatPlayer("player.png");
     creatEnemy("enemy.png");
     creatExplore("explore.png");
     creatBullet("bullet.png");
     creatEnemyFire("fire.png");
     creatRocket("rocket.png");
-
     setKeyboard();
+    creatText();
 
     //Set Timer
     app.ticker.add(delta => update(delta));
-
+    state = play;
 }
 
 function update() {
-    rocket.position.set((window.innerWidth - 150) / 2, (window.innerHeight - 150) / 2);
-    fire.x = 600;
-
-    movePlayer();
-    bulletShooting();
-    enemyAttack();
-    fireMove();
+    if (state != pause && state != stop) {
+        movePlayer();
+        enemyMoveAttack();
+        bulletShooting();
+        fireMove();
+        bulletAttackHitTest();
+        fireAttackHitTest();
+        enemyPlayerHitTest();
+        fireBulletHitTest();
+        if (state == dead) {
+            showPlayerDead();
+        }
+    }
+    showPlayerWin();
 }
 
 function setKeyboard() {
-    let space = keyboard(32);
-    space.press = () => {
-        bullet[useBullet].visible = true;
+    //空白建射擊
+    let keySpace = keyboard(32);
+    //Ctrl 或 P 暫停
+    let keyCtrl = keyboard(17);
+    let keyP = keyboard(80);
+    //Enter重新開始
+    let keyEnter = keyboard(13);
 
-        bullet[useBullet].x = player.x + (player.width - bullet[useBullet].width) / 2;
-        bullet[useBullet].y = player.y - 26;
-        bullet[useBullet].vx = player.vx;
-        bullet[useBullet].vy = -1 * bulletVy;
+    keySpace.press = () => {
+        if (state == play) {
+            bulletTimer = 0;
+            bulletShoot();
+        }
+    };
 
-        useBullet++;
-        if (useBullet >= maxBullet) useBullet = 0;
+    keyCtrl.press = () => {
+        if (state == play) state = pause;
+        else if (state == pause) state = play;
+    };
+
+    keyP.press = () => {
+        if (state == play) state = pause;
+        else if (state == pause) state = play;
+    };
+
+    keyEnter.press = () => {
+        replayGame();
     };
 }
 
+function bulletShoot() {
+    bullet[useBullet].visible = true;
+    bullet[useBullet].x = player.x + (player.width - bullet[useBullet].width) / 2;
+    bullet[useBullet].y = player.y - 18;
+    bullet[useBullet].vx = player.vx;
+    bullet[useBullet].vy = -1 * bulletVy;
+    useBullet++;
+    if (useBullet >= maxBullet) useBullet = 0;
+}
+
 function movePlayer() {
+    if (state == dead) return;
     //按方向鍵加速
     if (left.isDown == true && player.vx > -6) {
         player.vx += -0.3;
@@ -209,26 +338,194 @@ function movePlayer() {
         player.x = 0;
         player.vx = 0;
     }
-    if (player.x > screenWidth - player.width){
+    if (player.x > screenWidth - player.width) {
         player.x = screenWidth - player.width;
         player.vx = 0;
-    } 
-    if (player.y < 0){
+    }
+    if (player.y < 0) {
         player.y = 0;
         player.vy = 0;
-    } 
-    if (player.y > screenHeight - player.height){
+    }
+    if (player.y > screenHeight - player.height) {
         player.y = screenHeight - player.height;
         player.vy = 0;
-    } 
+    }
+
+    //自動射擊
+    if (space.isDown == true) {
+        bulletTimer++;
+        if (bulletTimer > atuoShootFrame) {
+            bulletShoot();
+            bulletTimer = 0;
+        }
+    }
 }
 
 function bulletShooting() {
     for (let i = 0; i < maxBullet; i++) {
-        if (bullet[i].visible === true) {
+        if (bullet[i].visible == true) {
             bullet[i].x += bullet[i].vx;
             bullet[i].y += bullet[i].vy;
             if (bullet[i].y < -1 * bullet[i].height) bullet[i].visible = false;
+        }
+    }
+}
+
+function enemyMoveAttack() {
+    //Enemy Move
+    enemiesContainer.x += enemiesContainer.vx;
+    if (enemiesContainer.x + containerWidth > screenWidth - 100) {
+        enemiesContainer.vx = -1;
+    }
+    else if (enemiesContainer.x < 1) {
+        enemiesContainer.vx = 1;
+    }
+
+    //Enemy Attack
+    attackTimer++;
+
+    if (attackTimer >= attackFrame) {
+        if (aliveEnemyNum > 0 && state == play) {
+            let randEnemy;
+            do {
+                randEnemy = randomInt(0, totalEnemeNum - 1);
+            } while (enemy[randEnemy].visible == false);
+
+            fire[useFire].x = enemy[randEnemy].getGlobalPosition().x + 7;
+            fire[useFire].y = enemy[randEnemy].y + 30;
+
+            let distX = player.x + player.width / 2 - fire[useFire].x - fire[useFire].width / 2
+            let distY = player.y + player.height / 2 - fire[useFire].y - fire[useFire].height / 2
+
+            fire[useFire].vx = distX * fireSpeed / Math.sqrt(distX * distX + distY * distY);
+            fire[useFire].vy = distY * fireSpeed / Math.sqrt(distX * distX + distY * distY);;
+            fire[useFire].visible = true;
+            useFire++;
+            if (useFire >= maxFire) useFire = 0;
+            attackTimer = 0;
+        }
+    }
+}
+
+function fireMove() {
+    for (let i = 0; i < maxFire; i++) {
+        if (fire[i].visible == true) {
+            fire[i].x += fire[i].vx;
+            fire[i].y += fire[i].vy;
+        }
+    }
+}
+function bulletAttackHitTest() {
+    bullet.forEach(function (bul) {
+        enemy.forEach(function (ene) {
+            if (ene.visible == true) {
+                if (hitTestRectangle(bul, ene) == true) {
+                    ene.visible = false;
+                    bul.visible = false;
+                    bul.position.set(-100, -100);
+                    aliveEnemyNum--;
+                }
+            }
+        })
+    })
+}
+
+function fireBulletHitTest() {
+    bullet.forEach(function (bul) {
+        if (bul.visible == true) {
+            fire.forEach(function (fir) {
+                if (hitTestRectangle(bul, fir) == true) {
+                    fir.visible = false;
+                    bul.visible = false;
+                    fir.position.set(2000, 1500);
+                    bul.position.set(-100, -100);
+                }
+            })
+        }
+    })
+}
+
+function fireAttackHitTest() {
+    if (state == dead) return;
+    fire.forEach(function (fir) {
+        if (fir.visible == true) {
+            if (hitTestRectangle(fir, player) == true) {
+                playerDead();
+            }
+        }
+    })
+}
+
+function enemyPlayerHitTest() {
+    if (state == dead) return;
+    enemy.forEach(function (ene) {
+        if (ene.visible == true) {
+            if (hitTestRectangle(ene, player) == true) {
+                playerDead();
+            }
+        }
+    })
+}
+
+function playerDead() {
+    explore.anchor.set(0.5, 0.5);
+    explore.position.set(player.x + player.width / 2, player.y + player.height / 2);
+    explore.visible = true;
+    player.visible = false;
+    attackTimer = 0;
+    state = dead;
+}
+
+function showPlayerDead() {
+    if (attackTimer % 40 == 20) {
+        explore.rotation = Math.PI / 180 * 90;
+    }
+    if (attackTimer % 40 == 0) {
+        explore.rotation = Math.PI / 180 * 0;
+    }
+    if (attackTimer > 180) {
+        explore.visible = false;
+        loseText.visible = true;
+        winText.visible = false;
+
+    }
+    if (attackTimer > 240) {
+        pressEnterText.visible = true;
+        state = stop;
+    }
+}
+
+function showPlayerWin(){
+    if(aliveEnemyNum <= 0 && state != dead){
+        attackTimer++;
+        if(attackTimer>300){
+            winText.visible = true;
+            rocketMove();
+        }
+        if(attackTimer>360){
+            pressEnterText.visible = true;
+        }
+    }
+}
+
+function rocketMove() {
+    for (let i = 0; i < 6; i++) {
+        rocket[i].visible = true;
+        rocket[i].x += 6*Math.cos(i*Math.PI/3);
+        rocket[i].y += 6*Math.sin(i*Math.PI/3);
+    }
+    if (attackTimer > 330){
+        for (let i = 6; i < 12; i++) {
+            rocket[i].visible = true;
+            rocket[i].x += 6*Math.cos(i*Math.PI/3 - Math.PI/2);
+            rocket[i].y += 6*Math.sin(i*Math.PI/3 - Math.PI/2);
+        }  
+    }
+    if (attackTimer > 360){
+        for (let i = 12; i < 18; i++) {
+            rocket[i].visible = true;
+            rocket[i].x += 6*Math.cos(i*Math.PI/3);
+            rocket[i].y += 6*Math.sin(i*Math.PI/3);
         }
     }
 }
@@ -270,3 +567,56 @@ function keyboard(keyCode) {
     return key;
 }
 
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function hitTestRectangle(r1, r2) {
+    //Define the variables we'll need to calculate
+    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+
+    //hit will determine whether there's a collision
+    hit = false;
+
+    //Find the center points of each sprite
+    r1.centerX = r1.getGlobalPosition().x + r1.width / 2;
+    r1.centerY = r1.y + r1.height / 2;
+    r2.centerX = r2.getGlobalPosition().x + r2.width / 2;
+    r2.centerY = r2.y + r2.height / 2;
+
+    //Find the half-widths and half-heights of each sprite
+    r1.halfWidth = r1.width / 2;
+    r1.halfHeight = r1.height / 2;
+    r2.halfWidth = r2.width / 2;
+    r2.halfHeight = r2.height / 2;
+
+    //Calculate the distance vector between the sprites
+    vx = r1.centerX - r2.centerX;
+    vy = r1.centerY - r2.centerY;
+
+    //Figure out the combined half-widths and half-heights
+    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+    //Check for a collision on the x axis
+    if (Math.abs(vx) < combinedHalfWidths) {
+
+        //A collision might be occuring. Check for a collision on the y axis
+        if (Math.abs(vy) < combinedHalfHeights) {
+
+            //There's definitely a collision happening
+            hit = true;
+        } else {
+
+            //There's no collision on the y axis
+            hit = false;
+        }
+    } else {
+
+        //There's no collision on the x axis
+        hit = false;
+    }
+
+    //`hit` will be either `true` or `false`
+    return hit;
+};
