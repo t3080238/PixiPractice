@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>week3-1</title>
+        <script type="text/javascript">
+            var cvs,ctx;
+            var GRAVITY=0.5;
+            var AIR_LOSS=0.988; //空氣阻力
+            var ENERGY_LOSS=0.7;    //反彈的能量損失
+            var radius=50;
+            var posX=50, posY=50;
+            var lastPosX=posX, lastPosY=posY;   //上個frame的滑鼠座標
+            var speedX=0, speedY=0;
+            var isMouseDown=false;  //滑鼠左鍵是否被按下
+            var img=new Image();
+
+            window.onload=function(){
+                cvs=document.getElementById("cvs");
+                ctx=cvs.getContext("2d");
+
+                cvs.addEventListener("mousedown", mouseDown);
+                cvs.addEventListener("mouseup", mouseUp);
+                cvs.addEventListener("mousemove", mouseMove);
+                cvs.addEventListener("mouseout", mouseOut);                
+            }
+
+            requestAnimationFrame(update); 
+
+            function drawBall(){
+                ctx.fillStyle="red";
+                ctx.beginPath();
+                ctx.arc(posX, posY, radius, 0, Math.PI*2, true);
+                ctx.fill();
+            }
+
+            function ballDrop(){                
+                if(isMouseDown==false){ //滑鼠放開的時候掉落
+                    posX+=speedX;
+                    posY+=speedY;
+                    speedX*=AIR_LOSS;  //空氣阻力
+
+                    if(posX<50){    //超出左右邊界反彈
+                        posX=50;
+                        speedX*=-ENERGY_LOSS;
+                    }
+                    else if(posX>750){
+                        posX=750;
+                        speedX*=-ENERGY_LOSS;
+                    }
+
+                    if(posY<50){    //超出上邊界反彈
+                        posY=50;
+                        speedY*=-1;
+                    }
+
+                    if(posY<550-GRAVITY){   //球在空中加速度
+                        speedY+=GRAVITY;
+                    }
+                    else{   //球貼撞到地面的時候
+                        posY=550;
+                        speedY*=-ENERGY_LOSS;
+                    }
+                }
+            }
+
+            function update(){
+                console.log(1);
+                ctx.clearRect(0,0,800,600);
+                lastPosX=posX;
+                lastPosY=posY;
+                ballDrop();
+                drawBall();
+                requestAnimationFrame(update); 
+            }
+
+            function mouseDown(e){
+                if(e.buttons==1){   //避免按下右鍵執行
+                    lastPosX=e.clientX;
+                    lastPosY=e.clientY;
+                    speedY=0;
+                    speedX=0;
+
+                    isMouseDown=true;
+                    posX=e.clientX;
+                    posY=e.clientY;
+                    openAlert=false;
+                }
+            }
+
+            function mouseUp(e){
+                if(isMouseDown==true){ //避免右鍵放開
+                    isMouseDown=false;
+                    speedX=e.clientX-lastPosX;
+                    speedY=e.clientY-lastPosY;
+                }
+            }
+
+            function mouseOut(e){
+                if(isMouseDown==true){ //滑出邊界的時候
+                    isMouseDown=false;
+                    speedX=e.clientX-lastPosX;
+                    speedY=e.clientY-lastPosY;
+                }
+            }
+
+            function mouseMove(e){
+                if(e.buttons==1 && isMouseDown==true){ //在畫面中拖曳的時候
+                    isMouseDown=true;
+                    posX=e.clientX;
+                    posY=e.clientY;
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <canvas id="cvs" width="800" height="600" style="border:1px solid #000000"></canvas>
+    </body>
+</html>

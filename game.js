@@ -2,10 +2,12 @@ let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) { type = "canvas" }
 PIXI.utils.sayHello(type);
 
+let player, texture, explore;
 let enemy = [];
 let bullet = [];
 let fire = [];
 let rocket = [];
+let particle = [];
 let enemiesContainer;
 let aliveEnemyNum = 0, totalEnemeNum = 0;
 let useBullet = 0, useFire = 0;
@@ -14,17 +16,19 @@ let bulletTimer = 0;
 let state;
 let containerWidth = 0;
 let loseText, pressEnterText, winText;
+let newParticle = -1;
 
-const rowEnemy = 3;
+const rowEnemy = 13;
 const screenWidth = 1024;
 const screenHeight = 768;
 const bulletVy = 10;
 const maxBullet = 10;
 const maxFire = 20;
-const attackFrame = 50;
+const attackFrame = 30;
 const atuoShootFrame = 12;
 const fireSpeed = 3;
 const play = "play", pause = "pause", dead = "dead", stop = "stop";
+const maxParticle = 200;
 
 let left = keyboard(37),
     up = keyboard(38),
@@ -135,19 +139,32 @@ function creatRocket(imageName) {
     for (let i = 0; i < 18; i++) {
         rocket[i] = new Sprite(texture);
         rocket[i].anchor.set(0.5, 0.5);
-        if (i < 12 && i>=6){
+        if (i < 12 && i >= 6) {
             rocket[i].rotation = Math.PI / 180 * 60 * i + 30;
         }
-        else{
+        else {
             rocket[i].rotation = Math.PI / 180 * 60 * i;
         }
-        rocket[i].vx = 2;
-        rocket[i].vy = 0;
         rocket[i].position.set(screenWidth / 2, screenHeight / 2);
         rocket[i].visible = false;
         app.stage.addChild(rocket[i]);
     }
 
+}
+
+function creatParticles() {
+    for (let i = 0; i < maxParticle; i++) {
+        newParticle++;
+        particle[i] = new PIXI.Graphics();
+        particle[i].beginFill(0xf0cf57);
+        particle[i].drawCircle(0, 0, 5);
+        particle[i].endFill();
+        particle[i].x = -100;
+        particle[i].y = -100;
+        particle[i].vx = 0;
+        particle[i].vy = 0;
+        app.stage.addChild(particle[i]);
+    }
 }
 
 function creatText() {
@@ -168,7 +185,9 @@ function creatText() {
     let style3 = new PIXI.TextStyle({
         fontFamily: "Arial",
         fontSize: 72,
-        fill: "#f0cf57"
+        fill: "#f0cf57",
+        stroke: '#ff3300',
+        strokeThickness: 3
     });
 
     loseText = new PIXI.Text("You Lose", style1);
@@ -215,6 +234,17 @@ function replayGame() {
         bul.position.set(-100, -100);
     });
 
+    rocket.forEach(function (roc) {
+        roc.position.set(screenWidth / 2, screenHeight / 2);
+        roc.visible = false;
+    });
+
+    particle.forEach(function (par) {
+        par.visible = false;
+        par.vx = 0;
+        par.vy = 0;
+    });
+
     explore.visible = false;
     loseText.visible = false;
     pressEnterText.visible = false;
@@ -232,6 +262,7 @@ function initial() {
     creatEnemyFire("fire.png");
     creatRocket("rocket.png");
     setKeyboard();
+    creatParticles();
     creatText();
 
     //Set Timer
@@ -450,6 +481,7 @@ function fireAttackHitTest() {
     fire.forEach(function (fir) {
         if (fir.visible == true) {
             if (hitTestRectangle(fir, player) == true) {
+                fir.visible = false;
                 playerDead();
             }
         }
@@ -487,45 +519,77 @@ function showPlayerDead() {
         explore.visible = false;
         loseText.visible = true;
         winText.visible = false;
-
+        enemy.forEach(function (ene) {
+            ene.visible = false;
+        });
     }
     if (attackTimer > 240) {
         pressEnterText.visible = true;
+        fire.forEach(function (fir) {
+            fir.visible = false;
+        });
         state = stop;
     }
 }
 
-function showPlayerWin(){
-    if(aliveEnemyNum <= 0 && state != dead){
+function showPlayerWin() {
+    if (aliveEnemyNum <= 0 && state != dead && state != stop) {
         attackTimer++;
-        if(attackTimer>300){
+        if (attackTimer > 300) {
+            player.visible = false;
+            state = pause;
             winText.visible = true;
+            fire.forEach(function (fir) {
+                fir.visible = false;
+            });
+            bullet.forEach(function (bul) {
+                bul.visible = false;
+            });
             rocketMove();
         }
-        if(attackTimer>360){
+        if (attackTimer == 360) {
             pressEnterText.visible = true;
+
+        }
+        else if (attackTimer > 360) {
+            playParticles();
         }
     }
+}
+
+function playParticles() {
+    particle[attackTimer % maxParticle].x = screenWidth / 2;
+    particle[attackTimer % maxParticle].y = screenHeight / 2;
+    let ranSpeed = Math.floor(Math.random() * 10 + 1);
+    let ranDegree = Math.floor(Math.random() * 360);
+    particle[attackTimer % maxParticle].vx = ranSpeed * Math.cos(ranDegree / (2 * Math.PI));
+    particle[attackTimer % maxParticle].vy = ranSpeed * Math.sin(ranDegree / (2 * Math.PI));
+    particle[attackTimer % maxParticle].visible = true;
+
+    particle.forEach(function (par) {
+        par.x += par.vx;
+        par.y += par.vy;
+    });
 }
 
 function rocketMove() {
     for (let i = 0; i < 6; i++) {
         rocket[i].visible = true;
-        rocket[i].x += 6*Math.cos(i*Math.PI/3);
-        rocket[i].y += 6*Math.sin(i*Math.PI/3);
+        rocket[i].x += 8 * Math.cos(i * Math.PI / 3);
+        rocket[i].y += 8 * Math.sin(i * Math.PI / 3);
     }
-    if (attackTimer > 330){
+    if (attackTimer > 320) {
         for (let i = 6; i < 12; i++) {
             rocket[i].visible = true;
-            rocket[i].x += 6*Math.cos(i*Math.PI/3 - Math.PI/2);
-            rocket[i].y += 6*Math.sin(i*Math.PI/3 - Math.PI/2);
-        }  
+            rocket[i].x += 8 * Math.cos(i * Math.PI / 3 - Math.PI / 2);
+            rocket[i].y += 8 * Math.sin(i * Math.PI / 3 - Math.PI / 2);
+        }
     }
-    if (attackTimer > 360){
+    if (attackTimer > 340) {
         for (let i = 12; i < 18; i++) {
             rocket[i].visible = true;
-            rocket[i].x += 6*Math.cos(i*Math.PI/3);
-            rocket[i].y += 6*Math.sin(i*Math.PI/3);
+            rocket[i].x += 8 * Math.cos(i * Math.PI / 3);
+            rocket[i].y += 8 * Math.sin(i * Math.PI / 3);
         }
     }
 }
