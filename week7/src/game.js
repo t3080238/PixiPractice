@@ -1,8 +1,4 @@
 export default function game() {
-    let type = "WebGL";
-    if (!PIXI.utils.isWebGLSupported()) { type = "canvas" }
-    PIXI.utils.sayHello(type);
-
     let player, texture, explore;
     let enemy = [];
     let bullet = [];
@@ -17,7 +13,6 @@ export default function game() {
     let state;
     let containerWidth = 0;
     let loseText, pressEnterText, winText;
-    let newParticle = -1;
 
     const rowEnemy = 13;
     const screenWidth = 1024;
@@ -37,7 +32,6 @@ export default function game() {
         down = keyboard(40),
         space = keyboard(32);
 
-    // Create a Pixi Application 
     let app = new PIXI.Application({
         width: screenWidth,
         height: screenHeight,
@@ -45,24 +39,15 @@ export default function game() {
         transparent: false,
         resolution: 1,
     });
-
-    // Add the canvas that Pixi automatically created for you to the HTML document 
+ 
     document.body.appendChild(app.view);
 
-    // load an image and run the `loadImage` function when it's done
+    // 載入圖片
     PIXI.loader
         .add([
             "images/npc.json",
         ])
-        .on("progress", loadProgressHandler)
         .load(initial);
-
-    function loadProgressHandler(loader, resource) {
-        let resourceName = resource.url;
-        console.log(resourceName);
-        let loadPercent = loader.progress;
-        console.log(loadPercent);
-    }
 
     function creatEnemy(imageName) {
         let texture = PIXI.TextureCache[imageName];
@@ -142,7 +127,6 @@ export default function game() {
 
     function creatParticles() {
         for (let i = 0; i < maxParticle; i++) {
-            newParticle++;
             particle[i] = new PIXI.Graphics();
             particle[i].beginFill(0xf0cf57);
             particle[i].drawCircle(0, 0, 5);
@@ -587,7 +571,7 @@ export default function game() {
         key.isUp = true;
         key.press = undefined;
         key.release = undefined;
-        //The `downHandler`
+
         key.downHandler = event => {
             if (event.keyCode === key.code) {
                 if (key.isUp && key.press) key.press();
@@ -597,7 +581,6 @@ export default function game() {
             event.preventDefault();
         };
 
-        //The `upHandler`
         key.upHandler = event => {
             if (event.keyCode === key.code) {
                 if (key.isDown && key.release) key.release();
@@ -607,7 +590,6 @@ export default function game() {
             event.preventDefault();
         };
 
-        //Attach event listeners
         window.addEventListener(
             "keydown", key.downHandler.bind(key), false
         );
@@ -622,52 +604,34 @@ export default function game() {
     }
 
     function hitTestRectangle(r1, r2) {
-        //Define the variables we'll need to calculate
         let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
 
-        //hit will determine whether there's a collision
         hit = false;
 
-        //Find the center points of each sprite
+        //中心座標
         r1.centerX = r1.getGlobalPosition().x + r1.width / 2;
         r1.centerY = r1.y + r1.height / 2;
         r2.centerX = r2.getGlobalPosition().x + r2.width / 2;
         r2.centerY = r2.y + r2.height / 2;
 
-        //Find the half-widths and half-heights of each sprite
+        //半邊長
         r1.halfWidth = r1.width / 2;
         r1.halfHeight = r1.height / 2;
         r2.halfWidth = r2.width / 2;
         r2.halfHeight = r2.height / 2;
 
-        //Calculate the distance vector between the sprites
+        //計算兩者距離
         vx = r1.centerX - r2.centerX;
         vy = r1.centerY - r2.centerY;
 
-        //Figure out the combined half-widths and half-heights
+        //計算兩者半邊和
         combinedHalfWidths = r1.halfWidth + r2.halfWidth;
         combinedHalfHeights = r1.halfHeight + r2.halfHeight;
 
-        //Check for a collision on the x axis
-        if (Math.abs(vx) < combinedHalfWidths) {
-
-            //A collision might be occuring. Check for a collision on the y axis
-            if (Math.abs(vy) < combinedHalfHeights) {
-
-                //There's definitely a collision happening
-                hit = true;
-            } else {
-                
-                //There's no collision on the y axis
-                hit = false;
-            }
-        } else {
-
-            //There's no collision on the x axis
-            hit = false;
-        }
-
-        //`hit` will be either `true` or `false`
-        return hit;
+        //若x和y的距離小於半邊寬高和，則為碰撞到
+        if (Math.abs(vx) < combinedHalfWidths && Math.abs(vy) < combinedHalfHeights) {
+            return true; 
+        } 
+        return false;
     };
 }
