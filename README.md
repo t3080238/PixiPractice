@@ -13,7 +13,6 @@
 
 ### week3
 1. Project：用**Canvas**畫出一顆球，可用滑鼠拖曳改變其位置
-
     1. 說明：學習Javascript及Canvas，並利用Canvas做出可拖曳的球，並加上重力掉落的效果
     2. 實際完成日期：2018/1/3
     3. 預計完成日期：2019/1/4
@@ -25,13 +24,11 @@
 
 ### week6
 
-    Project：用**JQuery**製作輪播元件並用**Webpack**打包作業
+Project：用**JQuery**製作輪播元件並用**Webpack**打包作業
 
-        說明：學習Webpack，並用JQuery製作輪播元件，再用Webpack打包作業
-
-        實際完成日期：2018/1/25
-
-        預計完成日期：2018/1/24
+    說明：學習Webpack，並用JQuery製作輪播元件，再用Webpack打包作業
+    實際完成日期：2018/1/25
+    預計完成日期：2018/1/24
 
 ### week7
     Project：用**PIXI**製作一款簡易的星際大戰遊戲
