@@ -1,34 +1,34 @@
 ### week1  
-* Project¡G**HTML4**¡B**CSS**±`¥Î¥\¯àÂ²³ø  
-¡@»¡©ú¡G¾Ç²ßHTML¤ÎCSS¡A¨Ã±N±`¥Îªº¼ÐÅÒ¤ÎÄÝ©Ê¾ã²z¦¨¤@¥÷Â²³ø  
-¡@¹ê»Ú§¹¦¨¤é´Á¡G2018/12/21  
-¡@¹w­p§¹¦¨¤é´Á¡G2018/12/21  
+* Projectï¼š**HTML5**ã€**CSS**å¸¸ç”¨åŠŸèƒ½ç°¡å ±  
+ã€€èªªæ˜Žï¼šå­¸ç¿’HTMLåŠCSSï¼Œä¸¦å°‡å¸¸ç”¨çš„æ¨™ç±¤åŠå±¬æ€§æ•´ç†æˆä¸€ä»½ç°¡å ±  
+ã€€å¯¦éš›å®Œæˆæ—¥æœŸï¼š2018/12/21  
+ã€€é è¨ˆå®Œæˆæ—¥æœŸï¼š2018/12/21  
 
 ### week2  
-* Project¡GRWD¤Áª©½m²ß  
-¡@»¡©ú¡G§Q¥ÎHTML+CSS¡A¥H¤Îmedia queries°µ¥XÅTÀ³¦¡±Æª©ªººô­¶  
-¡@¹ê»Ú§¹¦¨¤é´Á¡G2018/12/27  
-¡@¹w­p§¹¦¨¤é´Á¡G2018/12/27  
+* Projectï¼šRWDåˆ‡ç‰ˆç·´ç¿’  
+ã€€èªªæ˜Žï¼šåˆ©ç”¨HTML+CSSï¼Œä»¥åŠmedia queriesåšå‡ºéŸ¿æ‡‰å¼æŽ’ç‰ˆçš„ç¶²é   
+ã€€å¯¦éš›å®Œæˆæ—¥æœŸï¼š2018/12/27  
+ã€€é è¨ˆå®Œæˆæ—¥æœŸï¼š2018/12/27  
 
 ### week3  
-* Project¡G¥Î**Canvas**µe¥X¤@Áû²y¡A¥i¥Î·Æ¹«©ì¦²§ïÅÜ¨ä¦ì¸m  
-¡@»¡©ú¡G¾Ç²ßJavascript¤ÎCanvas¡A¨Ã§Q¥ÎCanvas°µ¥X¥i©ì¦²ªº²y¡A¨Ã¥[¤W­«¤O±¼¸¨ªº®ÄªG  
-¡@¹ê»Ú§¹¦¨¤é´Á¡G2018/1/3  
-¡@¹w­p§¹¦¨¤é´Á¡G2019/1/4  
+* Projectï¼šç”¨**Canvas**ç•«å‡ºä¸€é¡†çƒï¼Œå¯ç”¨æ»‘é¼ æ‹–æ›³æ”¹è®Šå…¶ä½ç½®  
+ã€€èªªæ˜Žï¼šå­¸ç¿’JavascriptåŠCanvasï¼Œä¸¦åˆ©ç”¨Canvasåšå‡ºå¯æ‹–æ›³çš„çƒï¼Œä¸¦åŠ ä¸Šé‡åŠ›æŽ‰è½çš„æ•ˆæžœ  
+ã€€å¯¦éš›å®Œæˆæ—¥æœŸï¼š2018/1/3  
+ã€€é è¨ˆå®Œæˆæ—¥æœŸï¼š2019/1/4  
 
-* Project¡G¥ÎCanvas¼ÒÀÀ²É¤l¯S®Äªº®ÄªG  
-¡@»¡©ú¡G¥ÎCanvas°µ¥X¥Ñµe­±¤¤¥¡µo´²¥X¥hªº²É¤l®ÄªG  
-¡@¹ê»Ú§¹¦¨¤é´Á¡G2018/1/4  
-¡@¹w­p§¹¦¨¤é´Á¡G2018/1/4  
+* Projectï¼šç”¨Canvasæ¨¡æ“¬ç²’å­ç‰¹æ•ˆçš„æ•ˆæžœ  
+ã€€èªªæ˜Žï¼šç”¨Canvasåšå‡ºç”±ç•«é¢ä¸­å¤®ç™¼æ•£å‡ºåŽ»çš„ç²’å­æ•ˆæžœ  
+ã€€å¯¦éš›å®Œæˆæ—¥æœŸï¼š2018/1/4  
+ã€€é è¨ˆå®Œæˆæ—¥æœŸï¼š2018/1/4  
 
 ### week6  
-* Project¡G¥Î**JQuery**»s§@½ü¼½¤¸¥ó¨Ã¥Î**Webpack**¥´¥]§@·~  
-¡@»¡©ú¡G¾Ç²ßWebpack¡A¨Ã¥ÎJQuery»s§@½ü¼½¤¸¥ó¡A¦A¥ÎWebpack¥´¥]§@·~  
-¡@¹ê»Ú§¹¦¨¤é´Á¡G2018/1/25  
-¡@¹w­p§¹¦¨¤é´Á¡G2018/1/24  
+* Projectï¼šç”¨**JQuery**è£½ä½œè¼ªæ’­å…ƒä»¶ä¸¦ç”¨**Webpack**æ‰“åŒ…ä½œæ¥­  
+ã€€èªªæ˜Žï¼šå­¸ç¿’Webpackï¼Œä¸¦ç”¨JQueryè£½ä½œè¼ªæ’­å…ƒä»¶ï¼Œå†ç”¨Webpackæ‰“åŒ…ä½œæ¥­  
+ã€€å¯¦éš›å®Œæˆæ—¥æœŸï¼š2018/1/25  
+ã€€é è¨ˆå®Œæˆæ—¥æœŸï¼š2018/1/24  
 
 ### week7  
-* Project¡G¥Î**PIXI**»s§@¤@´ÚÂ²©öªº¬P»Ú¤j¾Ô¹CÀ¸  
-¡@»¡©ú¡G¦Ü©xºô¾Ç²ßPIXI¨Ã¥ÎPIXI»s§@¤@´ÚÂ²©öªº¬P»Ú¤j¾Ô¹CÀ¸  
-¡@¹ê»Ú§¹¦¨¤é´Á¡G2018/1/30  
-¡@¹w­p§¹¦¨¤é´Á¡G2018/1/31  
+* Projectï¼šç”¨**PIXI**è£½ä½œä¸€æ¬¾ç°¡æ˜“çš„æ˜Ÿéš›å¤§æˆ°éŠæˆ²  
+ã€€èªªæ˜Žï¼šè‡³å®˜ç¶²å­¸ç¿’PIXIä¸¦ç”¨PIXIè£½ä½œä¸€æ¬¾ç°¡æ˜“çš„æ˜Ÿéš›å¤§æˆ°éŠæˆ²  
+ã€€å¯¦éš›å®Œæˆæ—¥æœŸï¼š2018/1/30  
+ã€€é è¨ˆå®Œæˆæ—¥æœŸï¼š2018/1/31  
