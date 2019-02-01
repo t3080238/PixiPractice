@@ -32,28 +32,39 @@ export default function game() {
         down = keyboard(40),
         space = keyboard(32);
 
-    let app = new PIXI.Application({
-        width: screenWidth,
-        height: screenHeight,
-        antialias: true,
-        transparent: false,
-        resolution: 1,
+    //Aliases 設定別名
+    let Application = PIXI.Application,
+        loader = PIXI.loader,
+        Sprite = PIXI.Sprite,
+        TextureCache = PIXI.TextureCache
+
+    // Create a Pixi Application 
+    let app = new Application({
+        width: screenWidth,         // default: 1024
+        height: screenHeight,        // default: 768
+        antialias: true,    // default: false
+        transparent: false, // default: false
+        resolution: 1,       // default: 1
+        //backgroundColor: 0x061639
     });
 
+    // Add the canvas that Pixi automatically created for you to the HTML document 
     document.body.appendChild(app.view);
 
-    // 載入圖片
-    PIXI.loader
+    // load an image and run the `loadImage` function when it's done
+    loader
+        //BallImage為別名
+        //.add("BallImage", "images/PokemonBall.png")
         .add([
             "images/npc.json",
         ])
         .load(initial);
 
     function creatEnemy(imageName) {
-        let texture = PIXI.TextureCache[imageName];
+        let texture = TextureCache[imageName];
         enemiesContainer = new PIXI.Container();
         for (let i = 0; i < rowEnemy * 2 + rowEnemy / 2; i++) {
-            enemy[i] = new PIXI.Sprite(texture);
+            enemy[i] = new Sprite(texture);
             enemy[i].position.set((i * 2) % rowEnemy * 50 + 50, Math.floor((i * 2) / rowEnemy) * 50 + 50);
             enemy[i].width = 32;
             enemy[i].height = 32;
@@ -67,8 +78,8 @@ export default function game() {
     }
 
     function creatPlayer(imageName) {
-        let texture = PIXI.TextureCache[imageName];
-        player = new PIXI.Sprite(texture);
+        let texture = TextureCache[imageName];
+        player = new Sprite(texture);
         player.vx = 0;
         player.vy = 0;
         app.stage.addChild(player);
@@ -76,17 +87,17 @@ export default function game() {
     }
 
     function creatExplore(imageName) {
-        texture = PIXI.TextureCache[imageName];
-        explore = new PIXI.Sprite(texture);
+        texture = TextureCache[imageName];
+        explore = new Sprite(texture);
         explore.visible = false;
         app.stage.addChild(explore);
         explore.position.set(150, 550);
     }
 
     function creatBullet(imageName) {
-        texture = PIXI.TextureCache[imageName];
+        texture = TextureCache[imageName];
         for (let i = 0; i < maxBullet; i++) {
-            bullet[i] = new PIXI.Sprite(texture);
+            bullet[i] = new Sprite(texture);
             bullet[i].visible = false;
             bullet[i].vx = 0;
             bullet[i].vy = 0;
@@ -96,9 +107,9 @@ export default function game() {
     }
 
     function creatEnemyFire(imageName) {
-        texture = PIXI.TextureCache[imageName];
+        texture = TextureCache[imageName];
         for (let i = 0; i < maxFire; i++) {
-            fire[i] = new PIXI.Sprite(texture);
+            fire[i] = new Sprite(texture);
             fire[i].visible = false;
             fire[i].vx = 0;
             fire[i].vy = 0;
@@ -109,9 +120,9 @@ export default function game() {
     }
 
     function creatRocket(imageName) {
-        texture = PIXI.TextureCache[imageName];
+        texture = TextureCache[imageName];
         for (let i = 0; i < 18; i++) {
-            rocket[i] = new PIXI.Sprite(texture);
+            rocket[i] = new Sprite(texture);
             rocket[i].anchor.set(0.5, 0.5);
             if (i < 12 && i >= 6) {
                 rocket[i].rotation = Math.PI / 180 * 60 * i + 30;
@@ -243,7 +254,7 @@ export default function game() {
     }
 
     function update() {
-        if (state !== pause && state !== stop) {
+        if (state != pause && state != stop) {
             movePlayer();
             enemyMoveAttack();
             bulletShooting();
@@ -303,38 +314,27 @@ export default function game() {
     function movePlayer() {
         if (state === dead) return;
         //按方向鍵加速
-        /*if (left.isDown === true && player.vx > -6) {
+        if (left.isDown === true && player.vx > -6) {
             player.vx += -0.3;
-        }*/
-        player.vx += (left.isDown === true && player.vx > -6) ? -0.3 : 0;
-
-        /*if (up.isDown === true && player.vy > -6) {
+        }
+        if (up.isDown === true && player.vy > -6) {
             player.vy += -0.3;
-        }*/
-        player.vy += (up.isDown === true && player.vy > -6) ? -0.3 : 0;
-
-        /*if (right.isDown === true && player.vx < 6) {
+        }
+        if (right.isDown === true && player.vx < 6) {
             player.vx += 0.3;
-        }*/
-        player.vx += (right.isDown === true && player.vx < 6) ? 0.3 : 0;
-
-        /*if (down.isDown === true && player.vy < 6) {
+        }
+        if (down.isDown === true && player.vy < 6) {
             player.vy += 0.3;
-        }*/
-        player.vy += (down.isDown === true && player.vy < 6) ? 0.3 : 0;
+        }
 
         //自動減速
         if (player.vy > 0) {
             player.vy -= 0.1;
-
-            //if (player.vy < 0) player.vy = 0;
-            player.vy = (player.vy < 0) ? 0 : player.vy;
+            if (player.vy < 0) player.vy = 0;
         }
         if (player.vx > 0) {
             player.vx -= 0.1;
-
-            //if (player.vx < 0) player.vx = 0;
-            player.vx = (player.vx < 0) ? 0 : player.vx;
+            if (player.vx < 0) player.vx = 0;
         }
         if (player.vy < 0) {
             player.vy += 0.1;
@@ -377,11 +377,10 @@ export default function game() {
 
     function bulletShooting() {
         for (let i = 0; i < maxBullet; i++) {
-            if (bullet[i].visible === true) {
-                bullet[i].x += bullet[i].vx;
-                bullet[i].y += bullet[i].vy;
-                if (bullet[i].y < -1 * bullet[i].height) bullet[i].visible = false;
-            }
+            if (bullet[i].visible === false) continue;
+            bullet[i].x += bullet[i].vx;
+            bullet[i].y += bullet[i].vy;
+            if (bullet[i].y < -1 * bullet[i].height) bullet[i].visible = false;
         }
     }
 
@@ -423,22 +422,21 @@ export default function game() {
 
     function fireMove() {
         for (let i = 0; i < maxFire; i++) {
-            if (fire[i].visible === true) {
-                fire[i].x += fire[i].vx;
-                fire[i].y += fire[i].vy;
-            }
+            if (fire[i].visible === false) continue;
+            fire[i].x += fire[i].vx;
+            fire[i].y += fire[i].vy;
         }
     }
+
     function bulletAttackHitTest() {
         bullet.forEach(function (bul) {
             enemy.forEach(function (ene) {
-                if (ene.visible === true) {
-                    if (hitTestRectangle(bul, ene) === true) {
-                        ene.visible = false;
-                        bul.visible = false;
-                        bul.position.set(-100, -100);
-                        aliveEnemyNum--;
-                    }
+                if (ene.visible === false) return;
+                if (hitTestRectangle(bul, ene) === true) {
+                    ene.visible = false;
+                    bul.visible = false;
+                    bul.position.set(-100, -100);
+                    aliveEnemyNum--;
                 }
             })
         })
@@ -446,27 +444,26 @@ export default function game() {
 
     function fireBulletHitTest() {
         bullet.forEach(function (bul) {
-            if (bul.visible === true) {
-                fire.forEach(function (fir) {
-                    if (hitTestRectangle(bul, fir) === true) {
-                        fir.visible = false;
-                        bul.visible = false;
-                        fir.position.set(2000, 1500);
-                        bul.position.set(-100, -100);
-                    }
-                })
-            }
+            if (bul.visible === false) return;
+            fire.forEach(function (fir) {
+                if (fir.visible === false) return;
+                if (hitTestRectangle(bul, fir) === true) {
+                    fir.visible = false;
+                    bul.visible = false;
+                    fir.position.set(2000, 1500);
+                    bul.position.set(-100, -100);
+                }
+            })
         })
     }
 
     function fireAttackHitTest() {
         if (state === dead) return;
         fire.forEach(function (fir) {
-            if (fir.visible === true) {
-                if (hitTestRectangle(fir, player) === true) {
-                    fir.visible = false;
-                    playerDead();
-                }
+            if (fir.visible === false) return;
+            if (hitTestRectangle(fir, player) === true) {
+                fir.visible = false;
+                playerDead();
             }
         })
     }
@@ -474,10 +471,9 @@ export default function game() {
     function enemyPlayerHitTest() {
         if (state === dead) return;
         enemy.forEach(function (ene) {
-            if (ene.visible === true) {
-                if (hitTestRectangle(ene, player) === true) {
-                    playerDead();
-                }
+            if (ene.visible === false) return;
+            if (hitTestRectangle(ene, player) === true) {
+                playerDead();
             }
         })
     }
@@ -516,7 +512,7 @@ export default function game() {
     }
 
     function showPlayerWin() {
-        if (aliveEnemyNum <= 0 && state !== dead && state !== stop) {
+        if (aliveEnemyNum <= 0 && state != dead && state != stop) {
             attackTimer++;
             if (attackTimer > 300) {
                 player.visible = false;
