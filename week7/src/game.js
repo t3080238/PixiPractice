@@ -39,7 +39,7 @@ export default function game() {
         transparent: false,
         resolution: 1,
     });
- 
+
     document.body.appendChild(app.view);
 
     // 載入圖片
@@ -243,7 +243,7 @@ export default function game() {
     }
 
     function update() {
-        if (state != pause && state != stop) {
+        if (state !== pause && state !== stop) {
             movePlayer();
             enemyMoveAttack();
             bulletShooting();
@@ -252,7 +252,7 @@ export default function game() {
             fireAttackHitTest();
             enemyPlayerHitTest();
             fireBulletHitTest();
-            if (state == dead) {
+            if (state === dead) {
                 showPlayerDead();
             }
         }
@@ -269,20 +269,20 @@ export default function game() {
         let keyEnter = keyboard(13);
 
         keySpace.press = () => {
-            if (state == play) {
+            if (state === play) {
                 bulletTimer = 0;
                 bulletShoot();
             }
         };
 
         keyCtrl.press = () => {
-            if (state == play) state = pause;
-            else if (state == pause) state = play;
+            if (state === play) state = pause;
+            else if (state === pause) state = play;
         };
 
         keyP.press = () => {
-            if (state == play) state = pause;
-            else if (state == pause) state = play;
+            if (state === play) state = pause;
+            else if (state === pause) state = play;
         };
 
         keyEnter.press = () => {
@@ -301,29 +301,40 @@ export default function game() {
     }
 
     function movePlayer() {
-        if (state == dead) return;
+        if (state === dead) return;
         //按方向鍵加速
-        if (left.isDown == true && player.vx > -6) {
+        /*if (left.isDown === true && player.vx > -6) {
             player.vx += -0.3;
-        }
-        if (up.isDown == true && player.vy > -6) {
+        }*/
+        player.vx += (left.isDown === true && player.vx > -6) ? -0.3 : 0;
+
+        /*if (up.isDown === true && player.vy > -6) {
             player.vy += -0.3;
-        }
-        if (right.isDown == true && player.vx < 6) {
+        }*/
+        player.vy += (up.isDown === true && player.vy > -6) ? -0.3 : 0;
+
+        /*if (right.isDown === true && player.vx < 6) {
             player.vx += 0.3;
-        }
-        if (down.isDown == true && player.vy < 6) {
+        }*/
+        player.vx += (right.isDown === true && player.vx < 6) ? 0.3 : 0;
+
+        /*if (down.isDown === true && player.vy < 6) {
             player.vy += 0.3;
-        }
+        }*/
+        player.vy += (down.isDown === true && player.vy < 6) ? 0.3 : 0;
 
         //自動減速
         if (player.vy > 0) {
             player.vy -= 0.1;
-            if (player.vy < 0) player.vy = 0;
+
+            //if (player.vy < 0) player.vy = 0;
+            player.vy = (player.vy < 0) ? 0 : player.vy;
         }
         if (player.vx > 0) {
             player.vx -= 0.1;
-            if (player.vx < 0) player.vx = 0;
+
+            //if (player.vx < 0) player.vx = 0;
+            player.vx = (player.vx < 0) ? 0 : player.vx;
         }
         if (player.vy < 0) {
             player.vy += 0.1;
@@ -355,7 +366,7 @@ export default function game() {
         }
 
         //自動射擊
-        if (space.isDown == true) {
+        if (space.isDown === true) {
             bulletTimer++;
             if (bulletTimer > atuoShootFrame) {
                 bulletShoot();
@@ -366,7 +377,7 @@ export default function game() {
 
     function bulletShooting() {
         for (let i = 0; i < maxBullet; i++) {
-            if (bullet[i].visible == true) {
+            if (bullet[i].visible === true) {
                 bullet[i].x += bullet[i].vx;
                 bullet[i].y += bullet[i].vy;
                 if (bullet[i].y < -1 * bullet[i].height) bullet[i].visible = false;
@@ -388,11 +399,11 @@ export default function game() {
         attackTimer++;
 
         if (attackTimer >= attackFrame) {
-            if (aliveEnemyNum > 0 && state == play) {
+            if (aliveEnemyNum > 0 && state === play) {
                 let randEnemy;
                 do {
                     randEnemy = randomInt(0, totalEnemeNum - 1);
-                } while (enemy[randEnemy].visible == false);
+                } while (enemy[randEnemy].visible === false);
 
                 fire[useFire].x = enemy[randEnemy].getGlobalPosition().x + 7;
                 fire[useFire].y = enemy[randEnemy].y + 30;
@@ -412,7 +423,7 @@ export default function game() {
 
     function fireMove() {
         for (let i = 0; i < maxFire; i++) {
-            if (fire[i].visible == true) {
+            if (fire[i].visible === true) {
                 fire[i].x += fire[i].vx;
                 fire[i].y += fire[i].vy;
             }
@@ -421,8 +432,8 @@ export default function game() {
     function bulletAttackHitTest() {
         bullet.forEach(function (bul) {
             enemy.forEach(function (ene) {
-                if (ene.visible == true) {
-                    if (hitTestRectangle(bul, ene) == true) {
+                if (ene.visible === true) {
+                    if (hitTestRectangle(bul, ene) === true) {
                         ene.visible = false;
                         bul.visible = false;
                         bul.position.set(-100, -100);
@@ -435,9 +446,9 @@ export default function game() {
 
     function fireBulletHitTest() {
         bullet.forEach(function (bul) {
-            if (bul.visible == true) {
+            if (bul.visible === true) {
                 fire.forEach(function (fir) {
-                    if (hitTestRectangle(bul, fir) == true) {
+                    if (hitTestRectangle(bul, fir) === true) {
                         fir.visible = false;
                         bul.visible = false;
                         fir.position.set(2000, 1500);
@@ -449,10 +460,11 @@ export default function game() {
     }
 
     function fireAttackHitTest() {
-        if (state == dead) return;
+        if (state === dead) return;
         fire.forEach(function (fir) {
-            if (fir.visible == true) {
-                if (hitTestRectangle(fir, player) == true) {
+            if (fir.visible === true) {
+                if (hitTestRectangle(fir, player) === true) {
+                    fir.visible = false;
                     playerDead();
                 }
             }
@@ -460,10 +472,10 @@ export default function game() {
     }
 
     function enemyPlayerHitTest() {
-        if (state == dead) return;
+        if (state === dead) return;
         enemy.forEach(function (ene) {
-            if (ene.visible == true) {
-                if (hitTestRectangle(ene, player) == true) {
+            if (ene.visible === true) {
+                if (hitTestRectangle(ene, player) === true) {
                     playerDead();
                 }
             }
@@ -480,10 +492,10 @@ export default function game() {
     }
 
     function showPlayerDead() {
-        if (attackTimer % 40 == 20) {
+        if (attackTimer % 40 === 20) {
             explore.rotation = Math.PI / 180 * 90;
         }
-        if (attackTimer % 40 == 0) {
+        if (attackTimer % 40 === 0) {
             explore.rotation = Math.PI / 180 * 0;
         }
         if (attackTimer > 180) {
@@ -504,7 +516,7 @@ export default function game() {
     }
 
     function showPlayerWin() {
-        if (aliveEnemyNum <= 0 && state != dead && state != stop) {
+        if (aliveEnemyNum <= 0 && state !== dead && state !== stop) {
             attackTimer++;
             if (attackTimer > 300) {
                 player.visible = false;
@@ -518,7 +530,7 @@ export default function game() {
                 });
                 rocketMove();
             }
-            if (attackTimer == 360) {
+            if (attackTimer === 360) {
                 pressEnterText.visible = true;
             }
             else if (attackTimer > 360) {
@@ -630,8 +642,8 @@ export default function game() {
 
         //若x和y的距離小於半邊寬高和，則為碰撞到
         if (Math.abs(vx) < combinedHalfWidths && Math.abs(vy) < combinedHalfHeights) {
-            return true; 
-        } 
+            return true;
+        }
         return false;
     };
 }
